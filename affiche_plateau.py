@@ -14,6 +14,7 @@ plateau = cl.Plateau(dimension)
 
 espace = 500
 pixel_case = 100
+epaisseur_mur=10
 
 print(plateau.carte_jouable.position)
 
@@ -40,13 +41,20 @@ def init_plateau():
 	maSurface = pygame.display.set_mode((largeur,hauteur))
 	pygame.display.set_caption('La mine hantée')
 	maSurface.fill(GREY)
-	
-	#que sont ces choses
+
+	#Zone de jeu 
 	pygame.draw.rect(maSurface,ORANGE,(500,0,hauteur,hauteur))
+	
+	#Zone carte hors plateau
 	pygame.draw.rect(maSurface,ORANGE,(175,520,pixel_case,pixel_case))
 	pygame.draw.rect(maSurface,WHITE,(169,514,pixel_case+12,pixel_case+12),10)
 	
-
+	#Quadrillage
+	for i in range (espace,largeur,pixel_case):
+		pygame.draw.line(maSurface,GREY,(i,0),(i,hauteur))
+		for j in range (0,hauteur,pixel_case):
+			pygame.draw.line(maSurface,GREY,(espace,j),(largeur,j),2)
+	
 
 def actualisation_plateau():
 	global plateau, espace, pixel_case, maSurface, largeur, hauteur
@@ -63,42 +71,36 @@ def actualisation_plateau():
 	carte_jouable = plateau.carte_jouable
 	dessine_carte(carte_jouable)
 	
-	#Quadrillage: Ce serait bien de pouvoir l'afficher en 1er plan afin de le passer dans init_plateau
-	for i in range (espace,largeur,pixel_case):
-		pygame.draw.line(maSurface,GREY,(i,0),(i,hauteur))
-		for j in range (0,hauteur,pixel_case):
-			pygame.draw.line(maSurface,GREY,(espace,j),(largeur,j),2)
+	#informations sur la partie en cours 
+	fontObj = pygame.font.SysFont('arial',40)
+	maSurfaceDeTexte = fontObj.render('Mission: ',True,WHITE)
+	monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+	monRectangleDeTexte .topleft = (30,20)
+	maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 
-		fontObj = pygame.font.SysFont('arial',40)
-		maSurfaceDeTexte = fontObj.render('Mission: ',True,WHITE)
-		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
-		monRectangleDeTexte .topleft = (30,20)
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
+	maSurfaceDeTexte = fontObj.render('Nombre de pépites: ',True,WHITE)
+	monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+	monRectangleDeTexte .topleft = (30,120)
+	maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 
-		maSurfaceDeTexte = fontObj.render('Nombre de pépites: ',True,WHITE)
-		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
-		monRectangleDeTexte .topleft = (30,120)
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
+	maSurfaceDeTexte = fontObj.render('Fantômes attrapés: ',True,WHITE)
+	monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+	monRectangleDeTexte .topleft = (30,200)
+	maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 
-		maSurfaceDeTexte = fontObj.render('Fantômes attrapés: ',True,WHITE)
-		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
-		monRectangleDeTexte .topleft = (30,200)
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
+	maSurfaceDeTexte = fontObj.render('Joker: ',True,WHITE)
+	monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+	monRectangleDeTexte .topleft = (30,330)
+	maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 
-		maSurfaceDeTexte = fontObj.render('Joker: ',True,WHITE)
-		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
-		monRectangleDeTexte .topleft = (30,330)
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
-
-		maSurfaceDeTexte = fontObj.render('Carte: ',True,WHITE)
-		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
-		monRectangleDeTexte .topleft = (30,510)
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
-	
+	maSurfaceDeTexte = fontObj.render('Carte: ',True,WHITE)
+	monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+	monRectangleDeTexte .topleft = (30,510)
+	maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 	
 	
 def dessine_carte(Carte):
-	global maSurface, BLACK, espace
+	global maSurface, BLACK, espace,epaisseur_mur
 	
 	# On vérifie que la carte est bien présente sur le plateau, i.e. que ce n'est pas la carte jouable
 	if Carte.position != None:
@@ -117,39 +119,39 @@ def dessine_carte(Carte):
 	#Carte type 1
 	if Carte.type_carte==1:
 		if Carte.orientation==0 or Carte.orientation==2:
-			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+4),(x_pixel+100,y_pixel+4),10)
-			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+95),(x_pixel+100,y_pixel+95),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+(epaisseur_mur/2)-1),(x_pixel+pixel_case,y_pixel+(epaisseur_mur/2)-1),epaisseur_mur)
+			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+pixel_case-(epaisseur_mur/2)),(x_pixel+pixel_case,y_pixel+pixel_case-(epaisseur_mur/2)),epaisseur_mur)
 		else:
-			pygame.draw.line(maSurface,BLACK,(x_pixel+4,y_pixel),(x_pixel+4,y_pixel+100),10)
-			pygame.draw.line(maSurface,BLACK,(x_pixel+95,y_pixel),(x_pixel+95,y_pixel+100),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel+(epaisseur_mur/2)-1,y_pixel),(x_pixel+(epaisseur_mur/2)-1,y_pixel+pixel_case),epaisseur_mur)
+			pygame.draw.line(maSurface,BLACK,(x_pixel+pixel_case-(epaisseur_mur/2),y_pixel),(x_pixel+pixel_case-(epaisseur_mur/2),y_pixel+pixel_case),epaisseur_mur)
 	#Carte type 2
 	if Carte.type_carte==2:
 		if Carte.orientation==0:
-			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+4),(x_pixel+100,y_pixel+4),10)
-			pygame.draw.line(maSurface,BLACK,(x_pixel+4,y_pixel),(x_pixel+4,y_pixel+100),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+(epaisseur_mur/2)-1),(x_pixel+pixel_case,y_pixel+(epaisseur_mur/2)-1),epaisseur_mur)
+			pygame.draw.line(maSurface,BLACK,(x_pixel+(epaisseur_mur/2)-1,y_pixel),(x_pixel+(epaisseur_mur/2)-1,y_pixel+pixel_case),epaisseur_mur)
 		elif Carte.orientation==1:
-			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+4),(x_pixel+100,y_pixel+4),10)
-			pygame.draw.line(maSurface,BLACK,(x_pixel+95,y_pixel),(x_pixel+95,y_pixel+100),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+(epaisseur_mur/2)-1),(x_pixel+pixel_case,y_pixel+(epaisseur_mur/2)-1),epaisseur_mur)
+			pygame.draw.line(maSurface,BLACK,(x_pixel+pixel_case-(epaisseur_mur/2),y_pixel),(x_pixel+pixel_case-(epaisseur_mur/2),y_pixel+pixel_case),epaisseur_mur)
 		elif Carte.orientation==2:
-			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+95),(x_pixel+100,y_pixel+95),10)
-			pygame.draw.line(maSurface,BLACK,(x_pixel+95,y_pixel),(x_pixel+95,y_pixel+100),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+pixel_case-(epaisseur_mur/2)),(x_pixel+pixel_case,y_pixel+pixel_case-(epaisseur_mur/2)),epaisseur_mur)
+			pygame.draw.line(maSurface,BLACK,(x_pixel+pixel_case-(epaisseur_mur/2),y_pixel),(x_pixel+pixel_case-(epaisseur_mur/2),y_pixel+pixel_case),epaisseur_mur)
 		else:
-			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+95),(x_pixel+100,y_pixel+95),10)
-			pygame.draw.line(maSurface,BLACK,(x_pixel+4,y_pixel),(x_pixel+4,y_pixel+100),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+pixel_case-(epaisseur_mur/2)),(x_pixel+pixel_case,y_pixel+pixel_case-(epaisseur_mur/2)),epaisseur_mur)
+			pygame.draw.line(maSurface,BLACK,(x_pixel+(epaisseur_mur/2)-1,y_pixel),(x_pixel+(epaisseur_mur/2)-1,y_pixel+pixel_case),epaisseur_mur)
 	#Carte type 3
 	if Carte.type_carte==3:
 		if Carte.orientation==0:
-			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+4),(x_pixel+100,y_pixel+4),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+(epaisseur_mur/2)-1),(x_pixel+pixel_case,y_pixel+(epaisseur_mur/2)-1),epaisseur_mur)
 		elif Carte.orientation==1:
-			pygame.draw.line(maSurface,BLACK,(x_pixel+95,y_pixel),(x_pixel+95,y_pixel+100),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel+pixel_case-(epaisseur_mur/2),y_pixel),(x_pixel+pixel_case-(epaisseur_mur/2),y_pixel+pixel_case),epaisseur_mur)
 		elif Carte.orientation==2:
-			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+95),(x_pixel+100,y_pixel+95),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel,y_pixel+pixel_case-(epaisseur_mur/2)),(x_pixel+pixel_case,y_pixel+pixel_case-(epaisseur_mur/2)),epaisseur_mur)
 		else:
-			pygame.draw.line(maSurface,BLACK,(x_pixel+4,y_pixel),(x_pixel+4,y_pixel+100),10)
+			pygame.draw.line(maSurface,BLACK,(x_pixel+(epaisseur_mur/2)-1,y_pixel),(x_pixel+(epaisseur_mur/2)-1,y_pixel+pixel_case),epaisseur_mur)
 	
 	#Affichage de la pépite
 	if Carte.pepite == True:
-		maSurface.blit(IMAGES_dict['pepite'],(x_pixel+40,y_pixel+40))
+		maSurface.blit(IMAGES_dict['pepite'],(x_pixel+(0,4*pixel_case),y_pixel+(0,4*pixel_case))
 	
 	#Affichage du chasseur
 	id_chasseur = Carte.chasseur
@@ -159,7 +161,7 @@ def dessine_carte(Carte):
 	#Affichage du fantôme
 	id_fantome = Carte.fantome
 	if id_fantome != 0 :
-		maSurface.blit(IMAGES_dict['fantome'],(x_pixel+70,y_pixel+10))
+		maSurface.blit(IMAGES_dict['fantome'],(x_pixel+(0,7*pixel_case,y_pixel+(0,1*pixel_case))
 
 		
 		
